@@ -2708,8 +2708,6 @@ void WaveshareEPaper3P97InBWYR::init_display_() {
   this->wait_until_idle_();
 };
 void HOT WaveshareEPaper3P97InBWYR::display() {
-  this->init_display_();
-
   this->command(0x10);
   this->start_data_();
   this->write_array(this->buffer_, this->get_buffer_length_());
