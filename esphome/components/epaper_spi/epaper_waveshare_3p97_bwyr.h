@@ -19,6 +19,9 @@ class EPaperWaveshare3P97InBWYR final : public EPaperBase {
   void draw_pixel_at(int x, int y, Color color) override;
   bool reset() override;
   bool initialise(bool partial) override;
+  bool should_wait_for_state_(EPaperState state) const override {
+    return state != EPaperState::INITIALISE && EPaperBase::should_wait_for_state_(state);
+  }
   bool transfer_data() override;
   void power_on() override {}
   void refresh_screen(bool partial) override;

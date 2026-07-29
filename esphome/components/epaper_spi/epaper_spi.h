@@ -126,6 +126,7 @@ class EPaperBase : public Display,
   void setup_pins_() const;
   virtual bool reset();
   virtual bool initialise(bool partial);
+  virtual bool should_wait_for_state_(EPaperState state) const { return state > EPaperState::SHOULD_WAIT; }
   void send_init_sequence_(const uint8_t *sequence, size_t length);
   void wait_for_idle_(bool should_wait);
   bool init_buffer_(size_t buffer_length);

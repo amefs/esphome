@@ -242,7 +242,7 @@ void EPaperBase::process_state_() {
 void EPaperBase::set_state_(EPaperState state, uint16_t delay) {
   ESP_LOGV(TAG, "Exit state %s", this->epaper_state_to_string_());
   this->state_ = state;
-  this->wait_for_idle_(state > EPaperState::SHOULD_WAIT);
+  this->wait_for_idle_(this->should_wait_for_state_(state));
   // allow subclasses to nominate delays
   if (delay == 0)
     delay = this->next_delay_;
