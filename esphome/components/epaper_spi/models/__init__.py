@@ -48,6 +48,9 @@ class EpaperModel:
         """
         return {}
 
+    def validate_config(self, config: dict) -> dict:
+        return config
+
     async def to_code(self, var: MockObj, config: dict) -> dict:
         """
         Generate model-specific code for the options added by add_options().

@@ -249,6 +249,61 @@ def test_model_with_explicit_dimensions(
     )
 
 
+def test_waveshare_3p97_bwyr_requires_busy_pin(
+    set_core_config: SetCoreConfigCallable,
+    set_component_config: Callable[[str, Any], None],
+) -> None:
+    set_core_config(
+        PlatformFramework.ESP32_IDF,
+        platform_data={KEY_BOARD: "esp32dev", KEY_VARIANT: VARIANT_ESP32},
+    )
+    set_component_config("spi", {"id": "spi_bus", "clk_pin": 18, "mosi_pin": 19})
+
+    with pytest.raises(
+        cv.Invalid, match=r"required key not provided @ data\['busy_pin'\]"
+    ):
+        run_schema_validation(
+            {
+                "id": "test_display",
+                "model": "waveshare-3.97in-bwyr",
+                "dc_pin": 21,
+                "reset_pin": 23,
+                "cs_pin": 5,
+            }
+        )
+
+
+def test_waveshare_3p97_bwyr_fixed_init_sequence() -> None:
+    model = MODELS["WAVESHARE-3.97IN-BWYR"]
+
+    assert model.get_dimensions({}) == (800, 480)
+    assert (0x61, 0x03, 0x20, 0x02, 0xA8) in model.initsequence
+
+
+def test_waveshare_3p97_bwyr_rejects_init_override(
+    set_core_config: SetCoreConfigCallable,
+    set_component_config: Callable[[str, Any], None],
+) -> None:
+    set_core_config(
+        PlatformFramework.ESP32_IDF,
+        platform_data={KEY_BOARD: "esp32dev", KEY_VARIANT: VARIANT_ESP32},
+    )
+    set_component_config("spi", {"id": "spi_bus", "clk_pin": 18, "mosi_pin": 19})
+
+    with pytest.raises(cv.Invalid, match="init_sequence cannot be overridden"):
+        run_schema_validation(
+            {
+                "id": "test_display",
+                "model": "waveshare-3.97in-bwyr",
+                "dc_pin": 21,
+                "busy_pin": 22,
+                "reset_pin": 23,
+                "cs_pin": 5,
+                "init_sequence": [(0x61, 0x00)],
+            }
+        )
+
+
 def test_model_with_transform(
     set_core_config: SetCoreConfigCallable,
     set_component_config: Callable[[str, Any], None],

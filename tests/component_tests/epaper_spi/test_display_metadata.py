@@ -83,6 +83,33 @@ def test_metadata_default_dimensions_from_model(
     assert meta.height == 480
 
 
+def test_waveshare_3p97_bwyr_metadata_dimensions(
+    set_core_config: SetCoreConfigCallable,
+    set_component_config: Callable[[str, Any], None],
+) -> None:
+    set_core_config(
+        PlatformFramework.ESP32_IDF,
+        platform_data={KEY_BOARD: "esp32dev", KEY_VARIANT: VARIANT_ESP32},
+    )
+    set_component_config("spi", {"id": "spi_bus", "clk_pin": 18, "mosi_pin": 19})
+
+    config = CONFIG_SCHEMA(
+        {
+            "id": "wave_3p97_display",
+            "model": "waveshare-3.97in-bwyr",
+            "dc_pin": 21,
+            "busy_pin": 22,
+            "reset_pin": 23,
+            "cs_pin": 5,
+        }
+    )
+    meta = get_display_metadata(config["id"])
+
+    assert meta is not None
+    assert meta.width == 800
+    assert meta.height == 480
+
+
 def test_metadata_has_writer_with_auto_clear(
     set_core_config: SetCoreConfigCallable,
     set_component_config: Callable[[str, Any], None],

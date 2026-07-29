@@ -133,6 +133,7 @@ def customise_schema(config):
     )(config)
     model = MODELS[config[CONF_MODEL]]
     config = model_schema(config)(config)
+    config = model.validate_config(config)
     width, height = model.get_dimensions(config)
     display.add_metadata(
         config[CONF_ID],
