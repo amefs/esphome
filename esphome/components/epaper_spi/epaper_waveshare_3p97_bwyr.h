@@ -17,10 +17,12 @@ class EPaperWaveshare3P97InBWYR final : public EPaperBase {
 
  protected:
   void draw_pixel_at(int x, int y, Color color) override;
+  bool is_idle_() const override { return this->busy_pin_->digital_read(); }
   bool reset() override;
   bool initialise(bool partial) override;
   bool should_wait_for_state_(EPaperState state) const override {
-    return state != EPaperState::INITIALISE && EPaperBase::should_wait_for_state_(state);
+    return state != EPaperState::INITIALISE && state != EPaperState::DEEP_SLEEP &&
+           EPaperBase::should_wait_for_state_(state);
   }
   bool transfer_data() override;
   void power_on() override {}
@@ -34,10 +36,7 @@ class EPaperWaveshare3P97InBWYR final : public EPaperBase {
     RESET_LOW,
     RESET_SETTLE,
     INIT_SEQUENCE,
-    INIT_SETTLE,
     POWER_ON,
-    POWER_ON_WAIT,
-    POWER_ON_SETTLE,
     INIT_DONE,
   };
 

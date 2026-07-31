@@ -63,7 +63,7 @@ bool EPaperWaveshare3P97InBWYR::reset() {
       return false;
     case Step::RESET_LOW:
       this->reset_pin_->digital_write(false);
-      delay(5);
+      delay(2);
       this->reset_pin_->digital_write(true);
       this->reset_duration_ = 200;
       this->step_ = Step::RESET_SETTLE;
@@ -81,24 +81,14 @@ bool EPaperWaveshare3P97InBWYR::initialise([[maybe_unused]] bool partial) {
   switch (this->step_) {
     case Step::INIT_SEQUENCE:
       this->send_init_sequence_(this->init_sequence_, this->init_sequence_length_);
+      this->delay_until_ = millis() + 100;
       this->wait_for_idle_(true);
-      this->step_ = Step::INIT_SETTLE;
-      return false;
-    case Step::INIT_SETTLE:
-      this->delay_until_ = millis() + 200;
       this->step_ = Step::POWER_ON;
       return false;
     case Step::POWER_ON:
       this->command(0x04);
       this->delay_until_ = millis() + 100;
-      this->step_ = Step::POWER_ON_WAIT;
-      return false;
-    case Step::POWER_ON_WAIT:
       this->wait_for_idle_(true);
-      this->step_ = Step::POWER_ON_SETTLE;
-      return false;
-    case Step::POWER_ON_SETTLE:
-      this->delay_until_ = millis() + 200;
       this->step_ = Step::INIT_DONE;
       return false;
     case Step::INIT_DONE:
@@ -137,13 +127,10 @@ bool HOT EPaperWaveshare3P97InBWYR::transfer_data() {
 
 void EPaperWaveshare3P97InBWYR::refresh_screen([[maybe_unused]] bool partial) {
   this->cmd_data(0x12, {0x00});
+  this->next_delay_ = 100;
 }
 
-void EPaperWaveshare3P97InBWYR::power_off() {
-  // The vendor busy wait requires an additional settle period after BUSY goes low.
-  delay(200);  // NOLINT
-  this->cmd_data(0x02, {0x00});
-}
+void EPaperWaveshare3P97InBWYR::power_off() { this->cmd_data(0x02, {0x00}); }
 
 void EPaperWaveshare3P97InBWYR::deep_sleep() { this->cmd_data(0x07, {0xA5}); }
 
